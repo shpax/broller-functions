@@ -70,7 +70,6 @@ export const getAwards = createBaseGetter<IAward>(BASE_AWARDS, (record) => {
   return {
     ..._.omit(record, ["levelIds"]),
     levelId: _.get(record, "levelIds[0]", null),
-    photo: _.get(record, "photo[0].url", null),
   };
 });
 export const getOpenedAwards = createBaseGetter<IOpenedAward>(
@@ -86,6 +85,8 @@ export const getOpenedAwards = createBaseGetter<IOpenedAward>(
 export const getLevels = createBaseGetter<ILevel>(BASE_LEVELS, (record) => {
   return {
     ...record,
-    photo: _.get(record, "photo[0].url", null),
+    awardOpenedPicture: _.get(record, "awardOpenedPicture[0].url", null),
+    awardClosedPicture: _.get(record, "awardClosedPicture[0].url", null),
+    picture: _.get(record, "picture[0].url", null),
   };
 });

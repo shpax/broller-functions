@@ -9,6 +9,7 @@ export interface IRoller extends IDbInstance {
   birthdate: string;
   awardIds: string[];
   levelId: string;
+  playlist: string;
 }
 
 export interface IOpenedAward extends IDbInstance {
@@ -19,13 +20,15 @@ export interface IOpenedAward extends IDbInstance {
 
 export interface IAward extends IDbInstance {
   name: string;
-  photo: string;
+  video: string;
   desc: string;
   levelId: string;
 }
 
 export interface ILevel extends IDbInstance {
   name: string;
-  photo: string;
   difficulty: string;
+  awardOpenedPicture: string;
+  awardClosedPicture: string;
+  picture: string;
 }

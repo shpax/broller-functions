@@ -13,6 +13,7 @@ export const BASE_ROLLERS: IBaseConstants = {
     phone: "Номер телефона",
     birthdate: "Дата рождения",
     awardIds: "Награды",
+    playlist: "Ссылка на плейлист",
     levelIds: "Текущий уровень",
   },
 };
@@ -30,7 +31,7 @@ export const BASE_AWARDS: IBaseConstants = {
   NAME: "Список Наград",
   FIELDS: {
     name: "Название",
-    photo: "Картинка",
+    video: "Ссылка на видео",
     desc: "Описание",
     levelIds: "Уровень",
   },
@@ -40,7 +41,9 @@ export const BASE_LEVELS: IBaseConstants = {
   NAME: "Уровни",
   FIELDS: {
     name: "Название",
-    photo: "Картинка",
     difficulty: "Сложность",
+    awardOpenedPicture: "Ачивка закрыта",
+    awardClosedPicture: "Ачивка открыта",
+    picture: "Уровень открыт",
   },
 };
