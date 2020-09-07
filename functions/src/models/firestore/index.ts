@@ -14,13 +14,13 @@ const auth = config.firestore
 
 admin.initializeApp(auth);
 
-let db = admin.firestore();
+const db = admin.firestore();
 
 function createSetter(dbName: string) {
   return (data: IDbInstance) => {
     const docRef = db.collection(dbName).doc(data.id);
 
-    docRef.set(_.omit(data, ["id"]));
+    return docRef.set(_.omit(data, ["id"]));
   };
 }
 

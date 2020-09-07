@@ -23,19 +23,21 @@ export const helloWorld = functions.https.onRequest((request, response) => {
   response.send("Hello from Firebase!");
 });
 
-export const rollers = functions.https.onRequest(async (request, response) => {
-  const rollers = await getRollers();
-  response.send(rollers);
-});
+export const getAtRollers = functions.https.onRequest(
+  async (request, response) => {
+    const rollers = await getRollers();
+    response.send(rollers);
+  }
+);
 
-export const openedAwards = functions.https.onRequest(
+export const getAtOpenedAwards = functions.https.onRequest(
   async (request, response) => {
     const rollers = await getOpenedAwards();
     response.send(rollers);
   }
 );
 
-export const awardsList = functions.https.onRequest(
+export const getAtAwards = functions.https.onRequest(
   async (request, response) => {
     const rollers = await getAwards();
 
@@ -43,10 +45,12 @@ export const awardsList = functions.https.onRequest(
   }
 );
 
-export const levels = functions.https.onRequest(async (request, response) => {
-  const rollers = await getLevels();
-  response.send(rollers);
-});
+export const getAtLevels = functions.https.onRequest(
+  async (request, response) => {
+    const rollers = await getLevels();
+    response.send(rollers);
+  }
+);
 
 export const migrateRollers = functions.https.onRequest(
   async (request, response) => {

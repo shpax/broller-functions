@@ -3,7 +3,7 @@ import { IRoller, IOpenedAward } from "../models/firestore/interfaces";
 export function mapRollerIdFromAtToFb(award: IOpenedAward, rollers: IRoller[]) {
   return {
     ...award,
-    rollerId: rollers.find((r) => r.id == award.rollerId)?.firebaseId,
+    rollerId: rollers.find((r) => r.id === award.rollerId)?.firebaseId,
   };
 }
 
