@@ -18,13 +18,14 @@ function createBaseGetter<T>(
   { NAME, FIELDS }: IBaseConstants,
   transform?: (data: any) => any
 ) {
-  return () => {
+  return (filterByFormula = "") => {
     return new Promise<T[]>((resolve, reject) => {
       const pages: any[] = [];
 
       base(NAME)
         .select({
           fields: _.values(FIELDS),
+          filterByFormula,
         })
         .eachPage(
           function page(records: any[], fetchNextPage: () => void) {
@@ -60,10 +61,9 @@ function createBaseGetter<T>(
 
 export const getRollers = createBaseGetter<IRoller>(BASE_ROLLERS, (record) => {
   return {
-    ..._.omit(record, ["levelIds"]),
+    ..._.omit(record, ["levelIds", "awardIds"]),
     levelId: _.get(record, "levelIds[0]", null),
-    // awardId: _.get(record, "awardIds[0]", null),
-    photo: _.get(record, "photo[0].url", null),
+    // photo: _.get(record, "photo[0].url", null),
   };
 });
 export const getAwards = createBaseGetter<IAward>(BASE_AWARDS, (record) => {
@@ -90,3 +90,65 @@ export const getLevels = createBaseGetter<ILevel>(BASE_LEVELS, (record) => {
     picture: _.get(record, "picture[0].url", null),
   };
 });
+
+export async function updateRollers(data: IRoller[]) {
+  const phonesStr = data
+    .map((roller) => `{${BASE_ROLLERS.FIELDS.phone}} = "${roller.phone}"`)
+    .join(", ");
+  const phonesFilter = `OR(${phonesStr})`;
+  const existingRollers = await getRollers(phonesFilter);
+
+  const createRecords: object[] = [];
+  const updateRecords: object[] = [];
+
+  data.forEach((roller) => {
+    const query = {
+      id: (existingRollers.find((r) => r.phone === roller.phone) || {}).id,
+      fields: {
+        [BASE_ROLLERS.FIELDS.name]: roller.name,
+        [BASE_ROLLERS.FIELDS.photo]: roller.photo,
+        [BASE_ROLLERS.FIELDS.phone]: roller.phone,
+        [BASE_ROLLERS.FIELDS.birthdate]: roller.birthdate,
+        [BASE_ROLLERS.FIELDS.firebaseId]: roller.firebaseId,
+      },
+    };
+
+    if (query.id) updateRecords.push(query);
+    else {
+      delete query.id;
+      createRecords.push(query);
+    }
+  });
+
+  if (createRecords.length) {
+    await Promise.all(
+      _.chunk(createRecords, 10).map((queries) => {
+        return new Promise((resolve, reject) => {
+          base(BASE_ROLLERS.NAME).create(
+            queries,
+            (err: Error, recs: object[]) => {
+              if (err) reject(err);
+              else resolve(recs);
+            }
+          );
+        });
+      })
+    );
+  }
+
+  if (updateRecords.length) {
+    await Promise.all(
+      _.chunk(updateRecords, 10).map((queries) => {
+        return new Promise((resolve, reject) => {
+          base(BASE_ROLLERS.NAME).update(
+            queries,
+            (err: Error, recs: object[]) => {
+              if (err) reject(err);
+              else resolve(recs);
+            }
+          );
+        });
+      })
+    );
+  }
+}

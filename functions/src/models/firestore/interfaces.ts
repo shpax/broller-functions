@@ -3,6 +3,7 @@ export interface IDbInstance {
 }
 
 export interface IRoller extends IDbInstance {
+  firebaseId: string;
   name: string;
   photo: string;
   phone: string;

@@ -5,13 +5,16 @@ import {
   getAwards,
   getLevels,
   getOpenedAwards,
+  updateRollers,
 } from "./models/airtable";
 import {
   setRoller,
   setLevel,
   setOpenedAward,
   setAward,
+  pullRollers,
 } from "./models/firestore";
+import { mapRollerIdFromAtToFb, mapRollerFromAtToFb } from "./helpers";
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -58,6 +61,42 @@ export const migrateRollers = functions.https.onRequest(
       _.flatten([
         rollers.map(setRoller),
         openedAwards.map(setOpenedAward),
+        awards.map(setAward),
+        levels.map(setLevel),
+      ])
+    );
+
+    response.send("done");
+  }
+);
+
+export const pullRollersToAT = functions.https.onRequest(
+  async (request, response) => {
+    const rollers = await pullRollers(Date.now() - 24 * 60 * 60 * 1000);
+
+    await updateRollers(rollers);
+
+    response.send("done");
+  }
+);
+
+export const pullAwardsToFireStore = functions.https.onRequest(
+  async (request, response) => {
+    const [rollers, openedAwards, awards, levels] = await Promise.all([
+      getRollers(),
+      getOpenedAwards(),
+      getAwards(),
+      getLevels(),
+    ]);
+
+    await Promise.all(
+      _.flatten([
+        rollers
+          .filter((roller) => !!roller.id)
+          .map((roller) => setRoller(mapRollerFromAtToFb(roller))),
+        openedAwards.map(
+          (award) => setOpenedAward(mapRollerIdFromAtToFb(award, rollers)) // todo: possibly CPU intencive task
+        ),
         awards.map(setAward),
         levels.map(setLevel),
       ])

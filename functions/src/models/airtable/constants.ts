@@ -9,6 +9,7 @@ export const BASE_ROLLERS: IBaseConstants = {
   NAME: "Ученики",
   FIELDS: {
     name: "Имя",
+    firebaseId: "Айди",
     photo: "Фото",
     phone: "Номер телефона",
     birthdate: "Дата рождения",
@@ -42,8 +43,8 @@ export const BASE_LEVELS: IBaseConstants = {
   FIELDS: {
     name: "Название",
     difficulty: "Сложность",
-    awardOpenedPicture: "Ачивка закрыта",
-    awardClosedPicture: "Ачивка открыта",
+    awardOpenedPicture: "Ачивка открыта",
+    awardClosedPicture: "Ачивка закрыта",
     picture: "Уровень открыт",
   },
 };
