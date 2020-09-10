@@ -35,6 +35,7 @@ export const BASE_AWARDS: IBaseConstants = {
     video: "Ссылка на видео",
     desc: "Описание",
     levelIds: "Уровень",
+    order: "Порядковый номер",
   },
 };
 

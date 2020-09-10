@@ -24,6 +24,7 @@ export interface IAward extends IDbInstance {
   video: string;
   desc: string;
   levelId: string;
+  order: number;
 }
 
 export interface ILevel extends IDbInstance {

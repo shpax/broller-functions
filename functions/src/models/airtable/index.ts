@@ -70,6 +70,7 @@ export const getAwards = createBaseGetter<IAward>(BASE_AWARDS, (record) => {
   return {
     ..._.omit(record, ["levelIds"]),
     levelId: _.get(record, "levelIds[0]", null),
+    order: +_.get(record, "order", 0),
   };
 });
 export const getOpenedAwards = createBaseGetter<IOpenedAward>(

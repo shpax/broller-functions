@@ -74,38 +74,64 @@ export const migrateRollers = functions.https.onRequest(
   }
 );
 
+const pullRollersToAtFunc = async () => {
+  const rollers = await pullRollers(Date.now() - 24 * 60 * 60 * 1000);
+
+  await updateRollers(rollers);
+};
+
 export const pullRollersToAT = functions.https.onRequest(
   async (request, response) => {
-    const rollers = await pullRollers(Date.now() - 24 * 60 * 60 * 1000);
-
-    await updateRollers(rollers);
+    await pullRollersToAtFunc();
 
     response.send("done");
   }
 );
+
+const pullAwardsToFireStoreFunc = async () => {
+  const [rollers, openedAwards, awards, levels] = await Promise.all([
+    getRollers(),
+    getOpenedAwards(),
+    getAwards(),
+    getLevels(),
+  ]);
+
+  await Promise.all(
+    _.flatten([
+      rollers
+        .filter((roller) => !!roller.id)
+        .map((roller) => setRoller(mapRollerFromAtToFb(roller))),
+      openedAwards.map(
+        (award) => setOpenedAward(mapRollerIdFromAtToFb(award, rollers)) // todo: possibly CPU intencive task
+      ),
+      awards.map(setAward),
+      levels.map(setLevel),
+    ])
+  );
+};
 
 export const pullAwardsToFireStore = functions.https.onRequest(
   async (request, response) => {
-    const [rollers, openedAwards, awards, levels] = await Promise.all([
-      getRollers(),
-      getOpenedAwards(),
-      getAwards(),
-      getLevels(),
-    ]);
-
-    await Promise.all(
-      _.flatten([
-        rollers
-          .filter((roller) => !!roller.id)
-          .map((roller) => setRoller(mapRollerFromAtToFb(roller))),
-        openedAwards.map(
-          (award) => setOpenedAward(mapRollerIdFromAtToFb(award, rollers)) // todo: possibly CPU intencive task
-        ),
-        awards.map(setAward),
-        levels.map(setLevel),
-      ])
-    );
+    await pullAwardsToFireStoreFunc();
 
     response.send("done");
   }
 );
+
+export const runSyncHttp = functions.https.onRequest(
+  async (request, response) => {
+    await pullRollersToAtFunc();
+    await pullAwardsToFireStoreFunc();
+
+    response.send("done");
+  }
+);
+
+export const runSync = functions.pubsub
+  .schedule("0 0/6 * * *")
+  .timeZone("Europe/Kiev")
+  .onRun(async () => {
+    await pullRollersToAtFunc();
+    await pullAwardsToFireStoreFunc();
+    return null;
+  });
